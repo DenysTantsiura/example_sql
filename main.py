@@ -12,7 +12,7 @@ from faker import Faker
 from faker.providers import DynamicProvider
 
 from connect_to_db import create_connection, DATABASE
-from sql_requests import sql_requests
+from sql_requests import sql_requests, sql_script
 
 
 NUMBER_OF_GROUPS = 3
@@ -208,4 +208,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    sql_requests()
+    sql_requests(sql_script)
