@@ -12,6 +12,7 @@ from faker import Faker
 from faker.providers import DynamicProvider
 
 from connect_to_db import create_connection, DATABASE
+from sql_requests import sql_requests
 
 
 NUMBER_OF_GROUPS = 3
@@ -130,6 +131,7 @@ def insert_data_to_db(groups: list, teachers: list, students: list, subjects: li
     try:
         with sqlite3.connect(DATABASE) as connection_to_db:
             active_cursor = connection_to_db.cursor()
+
             
             sql_to_groups = """INSERT INTO groups(group_name)
                             VALUES (?)"""
@@ -169,21 +171,24 @@ def main():
         return logging.critical(f'{SQL_CREATED_FILE} corrupted or not exist!')
 
     # Create list SQL-tables:
-    with open(SQL_CREATED_FILE, "r", encoding="utf-8") as fh:  # try/except?
+    with open(SQL_CREATED_FILE, 'r', encoding='utf-8') as fh:  # try/except?
         sql_create_all_tables = fh.read()
 
     list_all_tables = sql_create_all_tables.split(';')
     sql_create_all_tables = [f'{table};' for table in list_all_tables]
 
-    # Remove the previous database:
-    if pathlib.Path(DATABASE).exists():  # try/except?
-        pathlib.Path(DATABASE).unlink()
-        logging.info(f'REMOVING OLD DataBase DONE!.') if not pathlib.Path(DATABASE).exists() else None
+    # Remove the previous database: (Not needed if DROP TABLE IF EXISTS...)
+    # if pathlib.Path(DATABASE).exists():  # try/except?
+    #    pathlib.Path(DATABASE).unlink()
+    #    logging.info(f'REMOVING OLD DataBase DONE!.') if not pathlib.Path(DATABASE).exists() else None
 
     # Create DataBase (Adding tables):
+    # with open(SQL_CREATED_FILE, 'r', encoding= 'utf-8') as fh_sql:
+    #   sql_script = fh_sql.read()
+    # active_cursor.executescript(sql_script)
     with create_connection(DATABASE) as conn:
         if conn is not None:
-            # create all tables
+            # create all tables in queue
             [create_table(conn, sql_table) for sql_table in sql_create_all_tables]
 
         else:
@@ -203,3 +208,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    sql_requests()
