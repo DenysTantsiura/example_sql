@@ -47,7 +47,7 @@ def sql_requests(file: pathlib.Path) -> None:
     rc = request_counter = 1
     
     while pathlib.Path(file).is_file():
-        logging.info(f'\n======> {file}:')
+        logging.info(f'======> {file}:')
         script = read_file(file)
         with create_connection(DATABASE) as conn:
             if conn is not None:
