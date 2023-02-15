@@ -20,7 +20,7 @@ NUMBER_OF_STUDENTS = randint(30, 50)
 NUMBER_OF_TEACHERS = randint(3, 5)
 NUMBER_OF_SUBJECTS = randint(5, 8)
 NUMBER_OF_ASSESSMENTS = 19 * NUMBER_OF_SUBJECTS * NUMBER_OF_STUDENTS  # randint(1, 19)
-SQL_CREATED_FILE = './university_example.sql'
+SQL_CREATED_FILE = './sqlite_create_tables.sql'
 
 logging.basicConfig(level=logging.DEBUG, format='%(threadName)s %(message)s')
 

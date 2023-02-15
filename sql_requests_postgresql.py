@@ -3,7 +3,7 @@ import pathlib
 from sqlite3 import Error
 from typing import Optional
 
-from connect_to_db import create_connection, DATABASE
+from connect_to_db_sqlite import create_connection, DATABASE
 
 
 sql_script = pathlib.Path('./sql_requests/sqlr_1.sql')
