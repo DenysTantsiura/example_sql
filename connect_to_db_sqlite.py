@@ -1,5 +1,5 @@
-import sqlite3
 from contextlib import contextmanager
+import sqlite3
 
 DATABASE = './assessments.db'
 

@@ -4,10 +4,10 @@ SELECT
     s.name AS 'Student', 
     ROUND(avg(a.value_), 1) AS 'Success rate'
 FROM 
-    assessments AS a 
+    assessments a 
     INNER JOIN 
-    students AS s
+    students s
     ON a.student_id = s.id
 GROUP BY s.id
 ORDER BY avg(a.value_)
-DESC LIMIT 5
+DESC LIMIT 5;

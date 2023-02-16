@@ -3,16 +3,16 @@ from datetime import datetime
 import logging
 import pathlib
 from random import randint
-import sqlite3
-from sqlite3 import Error
 from timeit import default_timer
 from typing import Optional
 
 from faker import Faker
 from faker.providers import DynamicProvider
+from psycopg2 import Error # DatabaseError
 
-from connect_to_db_sqlite import create_connection, DATABASE
-from sql_requests_sqlite import sql_requests, sql_script
+from authentication import get_password
+from connect_to_db_postgresql import create_connection
+from sql_requests_postgresql import sql_requests, sql_script
 
 
 NUMBER_OF_GROUPS = 3
@@ -20,7 +20,11 @@ NUMBER_OF_STUDENTS = randint(30, 50)
 NUMBER_OF_TEACHERS = randint(3, 5)
 NUMBER_OF_SUBJECTS = randint(5, 8)
 NUMBER_OF_ASSESSMENTS = 19 * NUMBER_OF_SUBJECTS * NUMBER_OF_STUDENTS  # randint(1, 19)
-SQL_CREATED_FILE = './sqlite_create_tables.sql'
+SQL_CREATED_FILE = './create_tables_postgresql.sql'
+HOST = 'localhost'
+USER = 'postgres'
+DATABASE = 'postgres'
+PASSWORD = get_password()
 
 logging.basicConfig(level=logging.DEBUG, format='%(threadName)s %(message)s')
 
@@ -46,6 +50,8 @@ def create_table(conn, create_table_sql: str) -> None:
     try:
         active_cursor = conn.cursor()
         active_cursor.execute(create_table_sql)
+        active_cursor.close()  # w/o?
+        conn.commit()  # w/o?
 
     except Error as error:
         logging.error(f'Error: {error}\nwhen try created table:\n {create_table_sql}\n')
@@ -97,8 +103,8 @@ def prepare_data_to_insert(groups: list, students: list, teachers: list, subject
     # randint(1, NUMBER_OF_STUDENTS)) for value in assessments]
         
     # до 20 оцінок у кожного студента з усіх предметів:
-    def new_student_id() -> int:
-        return randint(1, NUMBER_OF_STUDENTS)
+    # def new_student_id() -> int:
+    #     return randint(1, NUMBER_OF_STUDENTS)
         
     for_assessments = []
     student_id = 1
@@ -109,6 +115,7 @@ def prepare_data_to_insert(groups: list, students: list, teachers: list, subject
         #     student_id = new_student_id()
         #     logging.info(f'New student id generated ({student_id}). Len({len(for_assessments)})')
         
+        # до 20 оцінок у кожного студента з усіх предметів:
         if Counter(elem[3] for elem in for_assessments).get(student_id, 0) >= randint(6, 19):
             student_id += 1
 
@@ -129,31 +136,32 @@ def insert_data_to_db(groups: list, teachers: list, students: list, subjects: li
     """Insertind data to DataBase."""
     # Створимо з'єднання з нашою БД та отримаємо об'єкт курсору для маніпуляцій з даними
     try:
-        with sqlite3.connect(DATABASE) as connection_to_db:
+        with create_connection(HOST, USER, DATABASE, PASSWORD) as connection_to_db:
             active_cursor = connection_to_db.cursor()
             
             sql_to_groups = """INSERT INTO groups(group_name)
-                            VALUES (?)"""
+                            VALUES (%s)"""
             active_cursor.executemany(sql_to_groups, groups)
             
             sql_to_teachers = """INSERT INTO teachers(name)
-                            VALUES (?)"""
+                            VALUES (%s)"""
             active_cursor.executemany(sql_to_teachers, teachers)
             
             sql_to_students = """INSERT INTO students(name, group_id)
-                            VALUES (?, ?)"""
+                            VALUES (%s, %s)"""
             active_cursor.executemany(sql_to_students, students)
             
             sql_to_subjects = """INSERT INTO subjects(subject, teacher_id)
-                            VALUES (?, ?)"""
+                            VALUES (%s, %s)"""
             active_cursor.executemany(sql_to_subjects, subjects)
             
             sql_to_assessments = """INSERT INTO assessments(value_, date_of, subject_id, student_id)
-                            VALUES (?, ?, ?, ?)"""
+                            VALUES (%s, %s, %s, %s)"""
             active_cursor.executemany(sql_to_assessments, assessments)
             
             # Фіксуємо наші зміни в БД
             connection_to_db.commit()
+            active_cursor.close()
 
     except Error as error:
         logging.error(f'Wrong insert. error:\n{error}')
@@ -184,19 +192,19 @@ def main():
     # Create DataBase (Adding tables):
     # with open(SQL_CREATED_FILE, 'r', encoding= 'utf-8') as fh_sql:
     #   sql_script = fh_sql.read()
-    # active_cursor.executescript(sql_script)
-    with create_connection(DATABASE) as conn:
+    # active_cursor.executescript(sql_script)  # include .commit & .close
+    with create_connection(HOST, USER, DATABASE, PASSWORD) as conn:
         if conn is not None:
             # create all tables in queue
             [create_table(conn, sql_table) for sql_table in sql_create_all_tables]
 
         else:
-            logging.error(f'Error! cannot create the database ({DATABASE}) connection.')
+            logging.error(f'Error! Cannot connect to the database\n{DATABASE}\non\n{HOST}\nwith login\n{USER}')
 
     # Generate fake-data and filling tables in the DataBase:
     groups, teachers, students, subjects, assessments = prepare_data_to_insert(*fake_data_generator())
     if insert_data_to_db(groups, teachers, students, subjects, assessments):
-        return 1
+        exit() # return 1
     
     logging.info(f'Recorded {NUMBER_OF_GROUPS} group(s).')
     logging.info(f'Recorded {NUMBER_OF_STUDENTS} student(s).')
@@ -205,6 +213,6 @@ def main():
     logging.info(f'Recorded overall {NUMBER_OF_ASSESSMENTS} assessment(s).')
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # !?
     main()
     sql_requests(sql_script)

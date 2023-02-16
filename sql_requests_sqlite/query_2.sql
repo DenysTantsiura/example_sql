@@ -16,7 +16,7 @@ FROM
 WHERE 
 	sub.subject = 'History'
 GROUP BY 
-	a.subject_id, s.id
+	s.id --a.subject_id, s.id
 ORDER BY 
 	AVG(a.value_) DESC, 
 	a.subject_id LIMIT 1;

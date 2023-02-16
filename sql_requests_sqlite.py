@@ -6,7 +6,7 @@ from typing import Optional
 from connect_to_db_sqlite import create_connection, DATABASE
 
 
-sql_script = pathlib.Path('./sql_requests/sqlr_1.sql')
+sql_script = pathlib.Path('./sql_requests_sqlite/query_1.sql')
 logging.basicConfig(level=logging.DEBUG, format='%(threadName)s %(message)s')
 
 
@@ -60,7 +60,9 @@ def sql_requests(file: pathlib.Path) -> None:
                 logging.error(f'Error! cannot create the database ({DATABASE}) connection.')
 
         rc += 1
-        file = file.parent.joinpath(f'{file.name[:4]}_{rc}{file.suffix}') # .stem
+        # file = file.parent.joinpath(f'{file.name[:5]}_{rc}{file.suffix}') # .stem
+        prefix = len(file.stem.split('_')[0])  # prefix length 
+        file = file.parent.joinpath(f'{file.name[:prefix]}_{rc}{file.suffix}')
         # print(file)
 
 

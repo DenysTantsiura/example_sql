@@ -4,9 +4,9 @@
 -- Table: students
 DROP TABLE IF EXISTS students;
 CREATE TABLE students (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   name VARCHAR(50) UNIQUE NOT NULL,
-  group_id INT UNSIGNED,
+  group_id INTEGER,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   -- CONSTRAINT students_name_un UNIQUE KEY (name),
   FOREIGN KEY (group_id) REFERENCES groups (id)
@@ -17,15 +17,15 @@ CREATE TABLE students (
 -- Table: groups
 DROP TABLE IF EXISTS groups;
 CREATE TABLE groups (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  group_name CHAR(10) UNIQUE NOT NULL,
+  id SERIAL PRIMARY KEY,
+  group_name CHAR(7) UNIQUE NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 		
 -- Table: teachers
 DROP TABLE IF EXISTS teachers;
 CREATE TABLE teachers (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   name VARCHAR(50) UNIQUE NOT NULL,
   -- CONSTRAINT teachers_name_uq UNIQUE KEY (name),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -34,9 +34,9 @@ CREATE TABLE teachers (
 -- Table: subjects
 DROP TABLE IF EXISTS subjects;
 CREATE TABLE subjects (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   subject CHAR(30), 
-  teacher_id INT UNSIGNED,
+  teacher_id INTEGER,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (teacher_id) REFERENCES teachers (id)
         ON DELETE SET NULL
@@ -46,11 +46,11 @@ CREATE TABLE subjects (
 -- Table: assessments
 DROP TABLE IF EXISTS assessments;
 CREATE TABLE assessments (
-  id INTEGER PRIMARY KEY AUTOINCREMENT, 
-  value_ TINYINT UNSIGNED NOT NULL, 
+  id SERIAL PRIMARY KEY, 
+  value_ NUMERIC CHECK (value_ > 0 AND value_ < 6), 
   date_of DATE NOT NULL,
-  subject_id INT UNSIGNED, 
-  student_id INT UNSIGNED,
+  subject_id INTEGER, 
+  student_id INTEGER,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (subject_id) REFERENCES subjects (id)
         ON DELETE SET NULL

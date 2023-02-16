@@ -1,13 +1,19 @@
-import sqlite3
 from contextlib import contextmanager
 
-DATABASE = './assessments.db'
+from psycopg2 import connect, Error  # DatabaseError
 
 
 @contextmanager
-def create_connection(db_file):
-    """Create a database connection to a SQLite database."""
-    conn = sqlite3.connect(db_file)
-    yield conn
-    conn.rollback()
-    conn.close()
+def create_connection(host='localhost', user='postgres', database='postgres', password='567234'):
+    """Create a database connection to a PostgreSQL database."""
+    conn = None
+    try:
+        conn = connect(host=host, user=user, database=database, password=password)
+        yield conn
+        
+    except Error as error:
+        print(error)
+
+    finally:
+        if conn is not None:
+            conn.close()

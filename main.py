@@ -20,7 +20,7 @@ NUMBER_OF_STUDENTS = randint(30, 50)
 NUMBER_OF_TEACHERS = randint(3, 5)
 NUMBER_OF_SUBJECTS = randint(5, 8)
 NUMBER_OF_ASSESSMENTS = 19 * NUMBER_OF_SUBJECTS * NUMBER_OF_STUDENTS  # randint(1, 19)
-SQL_CREATED_FILE = './university_example.sql'
+SQL_CREATED_FILE = './create_tables_sqlite.sql'
 
 logging.basicConfig(level=logging.DEBUG, format='%(threadName)s %(message)s')
 
@@ -46,6 +46,8 @@ def create_table(conn, create_table_sql: str) -> None:
     try:
         active_cursor = conn.cursor()
         active_cursor.execute(create_table_sql)
+        active_cursor.close()  # w/o?
+        conn.commit()  # w/o?
 
     except Error as error:
         logging.error(f'Error: {error}\nwhen try created table:\n {create_table_sql}\n')
@@ -97,8 +99,8 @@ def prepare_data_to_insert(groups: list, students: list, teachers: list, subject
     # randint(1, NUMBER_OF_STUDENTS)) for value in assessments]
         
     # до 20 оцінок у кожного студента з усіх предметів:
-    def new_student_id() -> int:
-        return randint(1, NUMBER_OF_STUDENTS)
+    # def new_student_id() -> int:
+    #     return randint(1, NUMBER_OF_STUDENTS)
         
     for_assessments = []
     student_id = 1
@@ -108,13 +110,14 @@ def prepare_data_to_insert(groups: list, students: list, teachers: list, subject
         #     logging.info(f'19 < {Counter(elem[3] for elem in for_assessments).get(student_id, 0)}.')
         #     student_id = new_student_id()
         #     logging.info(f'New student id generated ({student_id}). Len({len(for_assessments)})')
-        
+
+        # до 20 оцінок у кожного студента з усіх предметів:
         if Counter(elem[3] for elem in for_assessments).get(student_id, 0) >= randint(6, 19):
             student_id += 1
 
         if student_id > NUMBER_OF_STUDENTS:
             break
-            
+
         for_assessments.append((value,
                                 datetime(2023, 2, randint(1, 28)).date(),
                                 randint(1, NUMBER_OF_SUBJECTS),
@@ -129,10 +132,11 @@ def insert_data_to_db(groups: list, teachers: list, students: list, subjects: li
     """Insertind data to DataBase."""
     # Створимо з'єднання з нашою БД та отримаємо об'єкт курсору для маніпуляцій з даними
     try:
-        with sqlite3.connect(DATABASE) as connection_to_db:
+        # with sqlite3.connect(DATABASE) as connection_to_db:
+        with create_connection(DATABASE) as connection_to_db:
             active_cursor = connection_to_db.cursor()
             
-            sql_to_groups = """INSERT INTO groups(group_name)
+            sql_to_groups = """INSERT INTO groups_(group_name)
                             VALUES (?)"""
             active_cursor.executemany(sql_to_groups, groups)
             
@@ -152,6 +156,7 @@ def insert_data_to_db(groups: list, teachers: list, students: list, subjects: li
                             VALUES (?, ?, ?, ?)"""
             active_cursor.executemany(sql_to_assessments, assessments)
             
+            active_cursor.close()
             # Фіксуємо наші зміни в БД
             connection_to_db.commit()
 
@@ -184,7 +189,7 @@ def main():
     # Create DataBase (Adding tables):
     # with open(SQL_CREATED_FILE, 'r', encoding= 'utf-8') as fh_sql:
     #   sql_script = fh_sql.read()
-    # active_cursor.executescript(sql_script)
+    # active_cursor.executescript(sql_script)  # it's include .commit & .close
     with create_connection(DATABASE) as conn:
         if conn is not None:
             # create all tables in queue
@@ -196,7 +201,7 @@ def main():
     # Generate fake-data and filling tables in the DataBase:
     groups, teachers, students, subjects, assessments = prepare_data_to_insert(*fake_data_generator())
     if insert_data_to_db(groups, teachers, students, subjects, assessments):
-        return 1
+        exit() # return 1
     
     logging.info(f'Recorded {NUMBER_OF_GROUPS} group(s).')
     logging.info(f'Recorded {NUMBER_OF_STUDENTS} student(s).')
@@ -208,3 +213,4 @@ def main():
 if __name__ == "__main__":
     main()
     sql_requests(sql_script)
+    
