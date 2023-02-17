@@ -19,6 +19,6 @@ FROM
   groups_ AS g
 	  ON s.group_id = g.id
 WHERE g.id = 3 AND sub.id = 2 -- Group_ = "Group-2" AND Subject = "History" --AND a.date_of = MAX(a.date_of)
-GROUP BY Student, Group_, Subject, Date_of, Assessment
+GROUP BY Student, Group_, Subject, Date_of, Assessment  -- bug ? no grouping by Student
 ORDER BY Student, Date_of DESC;
 
