@@ -22,7 +22,7 @@ ORDER BY
 	AVG(a.value_) DESC, 
 	a.subject_id LIMIT 1;
 
--- alternative...:
+-- alternative not working...:
 /*SELECT 
     first_.id, 
     first_.Student, 
