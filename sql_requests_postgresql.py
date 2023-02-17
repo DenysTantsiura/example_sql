@@ -4,8 +4,7 @@ from typing import Optional
 
 from psycopg2 import connect, Error # DatabaseError
 
-from connect_to_db_sqlite import create_connection, DATABASE
-
+from connect_to_db_postgresql import create_connection
 
 sql_script = pathlib.Path('./sql_requests_postgresql/query_1.sql')
 logging.basicConfig(level=logging.DEBUG, format='%(threadName)s %(message)s')
@@ -43,14 +42,14 @@ def show_results(results: list) -> None:
     [logging.info(f'{line}') for line in results]
 
 
-def sql_requests(file: pathlib.Path) -> None:
+def sql_requests(file: pathlib.Path, HOST: str, USER: str, DATABASE: str, PASSWORD: str) -> None:
     """Cyclically perform requests."""
     rc = request_counter = 1
     
     while pathlib.Path(file).is_file():
         logging.info(f'======> {file}:')
         script = read_file(file)
-        with create_connection(DATABASE) as conn:
+        with create_connection(HOST, USER, DATABASE, PASSWORD) as conn:
             if conn is not None:
                 # execute query
                 select_result = perform_select(conn, script)
@@ -68,4 +67,5 @@ def sql_requests(file: pathlib.Path) -> None:
 
 
 if __name__ == "__main__":
-    sql_requests(sql_script)
+    from authentication import get_password
+    sql_requests(sql_script, 'balarama.db.elephantsql.com', 'scgkgtyo', 'scgkgtyo', get_password())

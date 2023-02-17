@@ -151,23 +151,23 @@ def insert_data_to_db(groups: list, teachers: list, students: list, subjects: li
             active_cursor = connection_to_db.cursor()
             
             sql_to_groups = """INSERT INTO groups_(group_name)
-                            VALUES (?)"""
+                            VALUES (?);"""
             active_cursor.executemany(sql_to_groups, groups)
             
             sql_to_teachers = """INSERT INTO teachers(name)
-                            VALUES (?)"""
+                            VALUES (?);"""
             active_cursor.executemany(sql_to_teachers, teachers)
             
             sql_to_students = """INSERT INTO students(name, group_id)
-                            VALUES (?, ?)"""
+                            VALUES (?, ?);"""
             active_cursor.executemany(sql_to_students, students)
             
             sql_to_subjects = """INSERT INTO subjects(subject, teacher_id)
-                            VALUES (?, ?)"""
+                            VALUES (?, ?);"""
             active_cursor.executemany(sql_to_subjects, subjects)
             
             sql_to_assessments = """INSERT INTO assessments(value_, date_of, subject_id, student_id)
-                            VALUES (?, ?, ?, ?)"""
+                            VALUES (?, ?, ?, ?);"""
             active_cursor.executemany(sql_to_assessments, assessments)
             
             active_cursor.close()

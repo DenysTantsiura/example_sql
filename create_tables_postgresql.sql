@@ -1,5 +1,13 @@
 /*The example shows various uses 
     of some similar commands (sequence)*/
+			
+-- Table: groups
+DROP TABLE IF EXISTS groups_;
+CREATE TABLE groups_ (
+  id SERIAL PRIMARY KEY,
+  group_name CHAR(7) UNIQUE NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 -- Table: students
 DROP TABLE IF EXISTS students;
@@ -8,18 +16,9 @@ CREATE TABLE students (
   name VARCHAR(50) UNIQUE NOT NULL,
   group_id INTEGER,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  -- CONSTRAINT students_name_un UNIQUE KEY (name),
-  FOREIGN KEY (group_id) REFERENCES groups (id)
+  FOREIGN KEY (group_id) REFERENCES groups_ (id)
         ON DELETE SET NULL
         ON UPDATE CASCADE
-);
-			
--- Table: groups
-DROP TABLE IF EXISTS groups;
-CREATE TABLE groups (
-  id SERIAL PRIMARY KEY,
-  group_name CHAR(7) UNIQUE NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 		
 -- Table: teachers
@@ -27,7 +26,6 @@ DROP TABLE IF EXISTS teachers;
 CREATE TABLE teachers (
   id SERIAL PRIMARY KEY,
   name VARCHAR(50) UNIQUE NOT NULL,
-  -- CONSTRAINT teachers_name_uq UNIQUE KEY (name),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 			

@@ -22,9 +22,9 @@ NUMBER_OF_SUBJECTS = randint(5, 8)
 NUMBER_OF_ASSESSMENTS = 19 * NUMBER_OF_SUBJECTS * NUMBER_OF_STUDENTS  # randint(1, 19)
 SQL_CREATED_FILE = './create_tables_postgresql.sql'
 YEAR_STUDY_START = 2022
-HOST = 'localhost'
-USER = 'postgres'
-DATABASE = 'postgres'
+HOST = 'balarama.db.elephantsql.com'
+USER = 'scgkgtyo'
+DATABASE = 'scgkgtyo'
 PASSWORD = get_password()
 
 logging.basicConfig(level=logging.DEBUG, format='%(threadName)s %(message)s')
@@ -52,7 +52,7 @@ def create_table(conn, create_table_sql: str) -> None:
         active_cursor = conn.cursor()
         active_cursor.execute(create_table_sql)
         active_cursor.close()  # w/o?
-        conn.commit()  # w/o?
+        # conn.commit()  # w/o?
 
     except Error as error:
         logging.error(f'Error: {error}\nwhen try created table:\n {create_table_sql}\n')
@@ -60,7 +60,7 @@ def create_table(conn, create_table_sql: str) -> None:
 
 def fake_data_generator() -> tuple:
     """Generate fake data about students assessments."""
-    fake_data = Faker('uk_UA')
+    fake_data = Faker('uk-UA')
     
     fake_groups = [f'Group-{number}' for number in range(1, NUMBER_OF_GROUPS + 1)]
     fake_students = [fake_data.name() for _ in range(NUMBER_OF_STUDENTS)]
@@ -153,28 +153,33 @@ def insert_data_to_db(groups: list, teachers: list, students: list, subjects: li
         with create_connection(HOST, USER, DATABASE, PASSWORD) as connection_to_db:
             active_cursor = connection_to_db.cursor()
             
-            sql_to_groups = """INSERT INTO groups(group_name)
-                            VALUES (%s)"""
+            sql_to_groups = """
+                INSERT INTO groups_(group_name) VALUES (%s);
+                """
             active_cursor.executemany(sql_to_groups, groups)
             
-            sql_to_teachers = """INSERT INTO teachers(name)
-                            VALUES (%s)"""
+            sql_to_teachers = """
+                INSERT INTO teachers(name) VALUES (%s);
+                """
             active_cursor.executemany(sql_to_teachers, teachers)
             
-            sql_to_students = """INSERT INTO students(name, group_id)
-                            VALUES (%s, %s)"""
+            sql_to_students = """
+                INSERT INTO students(name, group_id) VALUES (%s, %s);
+                """
             active_cursor.executemany(sql_to_students, students)
             
-            sql_to_subjects = """INSERT INTO subjects(subject, teacher_id)
-                            VALUES (%s, %s)"""
+            sql_to_subjects = """
+                INSERT INTO subjects(subject, teacher_id) VALUES (%s, %s);
+                """
             active_cursor.executemany(sql_to_subjects, subjects)
             
-            sql_to_assessments = """INSERT INTO assessments(value_, date_of, subject_id, student_id)
-                            VALUES (%s, %s, %s, %s)"""
+            sql_to_assessments = """
+                INSERT INTO assessments(value_, date_of, subject_id, student_id) VALUES (%s, %s, %s, %s);
+                """
             active_cursor.executemany(sql_to_assessments, assessments)
             
-            # Фіксуємо наші зміни в БД
-            connection_to_db.commit()
+            # Фіксуємо наші зміни в БД - commit in create_connection
+            # connection_to_db.commit()
             active_cursor.close()
 
     except Error as error:
@@ -198,11 +203,6 @@ def main():
     list_all_tables = sql_create_all_tables.split(';')
     sql_create_all_tables = [f'{table};' for table in list_all_tables]
 
-    # Remove the previous database: (Not needed if DROP TABLE IF EXISTS...)
-    # if pathlib.Path(DATABASE).exists():  # try/except?
-    #    pathlib.Path(DATABASE).unlink()
-    #    logging.info(f'REMOVING OLD DataBase DONE!.') if not pathlib.Path(DATABASE).exists() else None
-
     # Create DataBase (Adding tables):
     # with open(SQL_CREATED_FILE, 'r', encoding= 'utf-8') as fh_sql:
     #   sql_script = fh_sql.read()
@@ -211,7 +211,7 @@ def main():
         if conn is not None:
             # create all tables in queue
             [create_table(conn, sql_table) for sql_table in sql_create_all_tables]
-
+            # print('TABLES CREATED')
         else:
             logging.error(f'Error! Cannot connect to the database\n{DATABASE}\non\n{HOST}\nwith login\n{USER}')
 
@@ -229,4 +229,4 @@ def main():
 
 if __name__ == "__main__":  # !?
     main()
-    sql_requests(sql_script)
+    sql_requests(sql_script, HOST, USER, DATABASE, PASSWORD)

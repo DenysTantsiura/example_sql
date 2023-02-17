@@ -10,9 +10,11 @@ def create_connection(host='localhost', user='postgres', database='postgres', pa
     try:
         conn = connect(host=host, user=user, database=database, password=password)
         yield conn
+        conn.commit()
         
     except Error as error:
         print(error)
+        conn.rollback()
 
     finally:
         if conn is not None:
