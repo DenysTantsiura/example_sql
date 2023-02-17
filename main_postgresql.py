@@ -51,8 +51,7 @@ def create_table(conn, create_table_sql: str) -> None:
     try:
         active_cursor = conn.cursor()
         active_cursor.execute(create_table_sql)
-        active_cursor.close()  # w/o?
-        # conn.commit()  # w/o?
+        active_cursor.close() 
 
     except Error as error:
         logging.error(f'Error: {error}\nwhen try created table:\n {create_table_sql}\n')
@@ -112,22 +111,10 @@ def prepare_data_to_insert(groups: list, students: list, teachers: list, subject
     for_teachers = [(teacher,) for teacher in teachers]
     for_students = [(student, randint(1, NUMBER_OF_GROUPS)) for student in students]
     for_subjects = [(subject, randint(1, NUMBER_OF_TEACHERS)) for subject in subjects]
-    # for_assessments = [(value, datetime(2023, 2, randint(1, 28)).date(), randint(1, NUMBER_OF_SUBJECTS),
-    # randint(1, NUMBER_OF_STUDENTS)) for value in assessments]
-        
-    # до 20 оцінок у кожного студента з усіх предметів:
-    # def new_student_id() -> int:
-    #     return randint(1, NUMBER_OF_STUDENTS)
-        
+         
     for_assessments = []
     student_id = 1
     for value in assessments:
-        # student_id = new_student_id()
-        # while Counter(elem[3] for elem in for_assessments).get(student_id, 0) > 19:  # Counter({'12392': 2, '7862': 1})
-        #     logging.info(f'19 < {Counter(elem[3] for elem in for_assessments).get(student_id, 0)}.')
-        #     student_id = new_student_id()
-        #     logging.info(f'New student id generated ({student_id}). Len({len(for_assessments)})')
-        
         # до 20 оцінок у кожного студента з усіх предметів:
         if Counter(elem[3] for elem in for_assessments).get(student_id, 0) >= randint(6, 19):
             student_id += 1
@@ -203,22 +190,18 @@ def main():
     list_all_tables = sql_create_all_tables.split(';')
     sql_create_all_tables = [f'{table};' for table in list_all_tables]
 
-    # Create DataBase (Adding tables):
-    # with open(SQL_CREATED_FILE, 'r', encoding= 'utf-8') as fh_sql:
-    #   sql_script = fh_sql.read()
-    # active_cursor.executescript(sql_script)  # include .commit & .close
     with create_connection(HOST, USER, DATABASE, PASSWORD) as conn:
         if conn is not None:
             # create all tables in queue
             [create_table(conn, sql_table) for sql_table in sql_create_all_tables]
-            # print('TABLES CREATED')
+
         else:
             logging.error(f'Error! Cannot connect to the database\n{DATABASE}\non\n{HOST}\nwith login\n{USER}')
 
     # Generate fake-data and filling tables in the DataBase:
     groups, teachers, students, subjects, assessments = prepare_data_to_insert(*fake_data_generator())
     if insert_data_to_db(groups, teachers, students, subjects, assessments):
-        exit() # return 1
+        exit()
     
     logging.info(f'Recorded {NUMBER_OF_GROUPS} group(s).')
     logging.info(f'Recorded {NUMBER_OF_STUDENTS} student(s).')
@@ -227,6 +210,6 @@ def main():
     logging.info(f'Recorded overall {NUMBER_OF_ASSESSMENTS} assessment(s).')
 
 
-if __name__ == "__main__":  # !?
+if __name__ == "__main__": 
     main()
     sql_requests(sql_script, HOST, USER, DATABASE, PASSWORD)

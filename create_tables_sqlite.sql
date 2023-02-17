@@ -14,13 +14,9 @@ DROP TABLE IF EXISTS students;
 CREATE TABLE students (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   name VARCHAR(50) NOT NULL,
-  -- group_id INTEGER,
   group_id REFERENCES groups_ (id),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP --,
-  -- CONSTRAINT students_name_un UNIQUE KEY (name),
-  /*FOREIGN KEY (group_id) REFERENCES groups_ (id)
-        ON DELETE SET NULL
-        ON UPDATE CASCADE*/
+  -- CONSTRAINT students_name_un UNIQUE KEY (name)
 );
 
 -- Table: teachers
@@ -28,7 +24,6 @@ DROP TABLE IF EXISTS teachers;
 CREATE TABLE teachers (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   name VARCHAR(50) NOT NULL,
-  -- CONSTRAINT teachers_name_uq UNIQUE KEY (name),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 			

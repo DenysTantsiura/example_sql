@@ -53,17 +53,14 @@ def sql_requests(file: pathlib.Path) -> None:
             if conn is not None:
                 # execute query
                 select_result = perform_select(conn, script)
-                # logging.info(f'{select_result}\n')
                 show_results(select_result)
 
             else:
                 logging.error(f'Error! cannot create the database ({DATABASE}) connection.')
 
         rc += 1
-        # file = file.parent.joinpath(f'{file.name[:5]}_{rc}{file.suffix}') # .stem
         prefix = len(file.stem.split('_')[0])  # prefix length 
         file = file.parent.joinpath(f'{file.name[:prefix]}_{rc}{file.suffix}')
-        # print(file)
 
 
 if __name__ == "__main__":
