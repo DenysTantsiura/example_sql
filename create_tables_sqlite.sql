@@ -1,28 +1,28 @@
 /*The example shows various uses 
     of some similar commands (sequence)*/
 
--- Table: students
-DROP TABLE IF EXISTS students;
-CREATE TABLE students (
-  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  --group_id INTEGER,
-  group_id REFERENCES groups_ (id)
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  -- CONSTRAINT students_name_un UNIQUE KEY (name),
-  /*FOREIGN KEY (group_id) REFERENCES groups (id)
-        ON DELETE SET NULL
-        ON UPDATE CASCADE*/
-);
-			
--- Table: groups
-DROP TABLE IF EXISTS groups_; --[groups] -- keyword
+-- Table: groups_ --[groups] -- keyword
+DROP TABLE IF EXISTS groups_; 
 CREATE TABLE groups_ (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   group_name CHAR(10) UNIQUE NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-		
+
+-- Table: students
+DROP TABLE IF EXISTS students;
+CREATE TABLE students (
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  -- group_id INTEGER,
+  group_id REFERENCES groups_ (id),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP --,
+  -- CONSTRAINT students_name_un UNIQUE KEY (name),
+  /*FOREIGN KEY (group_id) REFERENCES groups_ (id)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE*/
+);
+
 -- Table: teachers
 DROP TABLE IF EXISTS teachers;
 CREATE TABLE teachers (

@@ -1,5 +1,5 @@
 /*
-Знайти середній бал у групах з певного предмета.
+Знайти середній бал у групах(і) з певного предмета.
 */
 SELECT
   g.id, 
@@ -10,14 +10,14 @@ FROM
   assessments AS a
   JOIN
   subjects AS sub
-  ON a.subject_id = sub.id
+	  ON a.subject_id = sub.id
   JOIN
   students AS s
-  ON a.student_id = s.id
+	  ON a.student_id = s.id
   JOIN
-  groups AS g
-  ON s.group_id = g.id
-WHERE Subject = 'History'
+  groups_ AS g
+	  ON s.group_id = g.id
+WHERE sub.id = 5 -- Subject = 'History'
 GROUP BY
   g.id,
   Subject;

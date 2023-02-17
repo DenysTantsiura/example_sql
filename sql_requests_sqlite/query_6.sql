@@ -8,7 +8,7 @@ SELECT
 FROM
   students AS s
   JOIN
-  groups AS g
-  ON s.group_id = g.id
-WHERE Group_ = 'Group-2';
+  groups_ AS g
+	  ON s.group_id = g.id
+WHERE g.id = 3; -- Group_ = 'Group-2';
 --ORDER BY Group_;

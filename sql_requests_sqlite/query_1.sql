@@ -7,7 +7,7 @@ FROM
     assessments a 
     INNER JOIN 
     students s
-    ON a.student_id = s.id
+		ON a.student_id = s.id
 GROUP BY s.id
-ORDER BY avg(a.value_)
-DESC LIMIT 5;
+ORDER BY avg(a.value_) DESC 
+LIMIT 5;

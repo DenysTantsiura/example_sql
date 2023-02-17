@@ -9,9 +9,9 @@ FROM
   assessments AS a
   JOIN
   subjects AS sub
-  ON a.subject_id = sub.id
+	  ON a.subject_id = sub.id
   JOIN
   students AS s
-  ON a.student_id = s.id
-WHERE Student = 'Венедикт Забашта'
+	  ON a.student_id = s.id
+WHERE s.id = 9 -- Student = 'Венедикт Забашта'
 GROUP BY Subject;

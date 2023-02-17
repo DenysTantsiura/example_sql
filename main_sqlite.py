@@ -1,5 +1,5 @@
 from collections import Counter
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 import pathlib
 from random import randint
@@ -21,6 +21,7 @@ NUMBER_OF_TEACHERS = randint(3, 5)
 NUMBER_OF_SUBJECTS = randint(5, 8)
 NUMBER_OF_ASSESSMENTS = 19 * NUMBER_OF_SUBJECTS * NUMBER_OF_STUDENTS  # randint(1, 19)
 SQL_CREATED_FILE = './create_tables_sqlite.sql'
+YEAR_STUDY_START = 2022
 
 logging.basicConfig(level=logging.DEBUG, format='%(threadName)s %(message)s')
 
@@ -46,8 +47,8 @@ def create_table(conn, create_table_sql: str) -> None:
     try:
         active_cursor = conn.cursor()
         active_cursor.execute(create_table_sql)
-        active_cursor.close()  # w/o?
-        conn.commit()  # w/o?
+        # conn.commit()  # w/o?
+        # active_cursor.close()  # w/o?
 
     except Error as error:
         logging.error(f'Error: {error}\nwhen try created table:\n {create_table_sql}\n')
@@ -89,6 +90,18 @@ def fake_data_generator() -> tuple:
     return fake_groups, fake_students, fake_teachers, fake_subjects, fake_assessments
 
 
+def random_study_day():
+    start_date = datetime.strptime(f'{YEAR_STUDY_START}-09-01', '%Y-%m-%d')
+    end_date = datetime.strptime(f'{YEAR_STUDY_START+1}-06-15', '%Y-%m-%d')
+
+    current_date = start_date + timedelta(randint(1, (end_date - start_date).days - 9))  # 9 = Saturday Sunday + last week
+
+    while current_date.isoweekday() in (6, 7):  # Saturday Sunday
+        current_date += timedelta(1)
+    
+    return current_date
+
+
 def prepare_data_to_insert(groups: list, students: list, teachers: list, subjects: list, assessments: list) -> tuple:
     """Converting list data to list of tuples."""
     for_groups = [(group,) for group in groups]
@@ -119,7 +132,8 @@ def prepare_data_to_insert(groups: list, students: list, teachers: list, subject
             break
 
         for_assessments.append((value,
-                                datetime(2023, 2, randint(1, 28)).date(),
+                                # datetime(2023, 2, randint(1, 28)).date(),
+                                random_study_day(),
                                 randint(1, NUMBER_OF_SUBJECTS),
                                 student_id))
     
@@ -194,6 +208,7 @@ def main():
         if conn is not None:
             # create all tables in queue
             [create_table(conn, sql_table) for sql_table in sql_create_all_tables]
+            conn.commit()  # w/o?
 
         else:
             logging.error(f'Error! cannot create the database ({DATABASE}) connection.')

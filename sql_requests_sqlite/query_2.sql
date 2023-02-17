@@ -9,12 +9,12 @@ FROM
 	assessments AS a 
 	INNER JOIN 
 	students AS s
-	ON a.student_id = s.id
+		ON a.student_id = s.id
 	INNER JOIN 
 	subjects AS sub
-	ON a.subject_id = sub.id
+		ON a.subject_id = sub.id
 WHERE 
-	sub.subject = 'History'
+	sub.id = 5 -- sub.subject = 'History'
 GROUP BY 
 	s.id --a.subject_id, s.id
 ORDER BY 
@@ -36,11 +36,11 @@ FROM (SELECT
         assessments AS a 
 	    INNER JOIN 
         students AS s
-	    ON a.student_id = s.id
+			ON a.student_id = s.id
 	    INNER JOIN 
         subjects AS sub
-	    ON a.subject_id = sub.id
-	    -- WHERE sub.subject = 'History'
+			ON a.subject_id = sub.id
+	    -- WHERE sub.id = 5 -- sub.subject = 'History'
 	  GROUP BY 
         Student, Subject)
 GROUP BY 

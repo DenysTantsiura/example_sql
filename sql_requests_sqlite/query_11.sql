@@ -9,12 +9,12 @@ FROM
   assessments AS a
   JOIN
   subjects AS sub
-  ON a.subject_id = sub.id
+	  ON a.subject_id = sub.id
   JOIN
   students AS s
-  ON a.student_id = s.id
+	  ON a.student_id = s.id
   JOIN
   teachers AS t
-  ON sub.teacher_id = t.id
---WHERE Student = 'Роксолана Гук' AND Teacher = 'Соломія Гузій'
-GROUP BY Student, Teacher; 
+	  ON sub.teacher_id = t.id
+WHERE s.id = 9 AND t.id = 3 -- Student = 'Роксолана Гук' AND Teacher = 'Соломія Гузій'
+GROUP BY Student, Teacher; -- s.id

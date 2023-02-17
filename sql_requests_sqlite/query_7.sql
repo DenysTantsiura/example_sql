@@ -10,12 +10,12 @@ FROM
   assessments AS a
   JOIN
   subjects AS sub
-  ON a.subject_id = sub.id
+	  ON a.subject_id = sub.id
   JOIN
   students AS s
-  ON a.student_id = s.id
+	  ON a.student_id = s.id
   JOIN
-  groups AS g
-  ON s.group_id = g.id
-WHERE Group_ = 'Group-2' AND Subject = 'History'
+  groups_ AS g
+	  ON s.group_id = g.id
+WHERE g.id = 2 AND sub.id = 4 -- Group_ = 'Group-2' AND Subject = 'History'
 ORDER BY Student;

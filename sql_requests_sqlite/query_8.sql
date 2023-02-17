@@ -8,9 +8,9 @@ FROM
   assessments AS a
   JOIN
   subjects AS sub
-  ON a.subject_id = sub.id
+	  ON a.subject_id = sub.id
   JOIN
   teachers AS t
-  ON sub.teacher_id = t.id
-WHERE Teacher = 'Соломія Гузій';
+	  ON sub.teacher_id = t.id
+WHERE t.id = 3; -- Teacher = 'Соломія Гузій';
 --GROUP BY Teacher;

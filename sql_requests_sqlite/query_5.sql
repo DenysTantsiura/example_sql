@@ -9,6 +9,6 @@ FROM
   subjects AS sub
   JOIN
   teachers AS t
-  ON sub.teacher_id = t.id
-WHERE Teacher = 'Соломія Гузій';
+	  ON sub.teacher_id = t.id
+WHERE t.id = 2; -- Teacher = 'Соломія Гузій';
 --ORDER BY Teacher;
